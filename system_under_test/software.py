@@ -1,0 +1,60 @@
+import logging
+
+from collections import defaultdict
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
+from system_under_test.errors import SignalReadError
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class Signal:
+    """Represents a signal in a system."""
+
+    channel: str
+    values: List[int]
+
+
+class Receiver:
+    def __init__(self, channels: List[str], auto_enabled: Optional[bool] = True) -> None:
+        self.__signal_channels: Dict[str, List[int]] = defaultdict(list)
+        for channel in channels:
+            self.__signal_channels[channel] = []
+        self.__is_enabled = auto_enabled
+
+    @property
+    def is_enabled(self) -> bool:
+        return self.__is_enabled
+
+    def enable(self) -> None:
+        self.__is_enabled = True
+
+    def disable(self) -> None:
+        self.__is_enabled = False
+
+    def get_current_channels(self) -> Tuple[str]:
+        return tuple(self.__signal_channels.keys())
+
+    def __update_channel(self, channel_name: str, new_values: List[int]) -> None:
+        current_contents = self.__signal_channels[channel_name]
+        self.__signal_channels[channel_name] = current_contents + new_values
+
+    def receive_signal(
+        self, signal: Signal, not_exist_ok: Optional[bool] = True
+    ) -> None:
+        if not self.__is_enabled:
+            raise SignalReadError(
+                channel=signal.channel,
+                message=f"Receiver for channel '{signal.channel}' is disabled",
+            )
+        if signal.channel not in self.get_current_channels():
+            if not_exist_ok:
+                raise SignalReadError(
+                    channel=signal.channel, message="Invalid signal channel"
+                )
+            logger.info(
+                f"Channel '{signal.channel}' not in current channels, added new."
+            )
+        self.__update_channel(signal.channel, signal.values)

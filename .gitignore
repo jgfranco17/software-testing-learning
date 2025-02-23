@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+.pytest_*
+
+# templates
+.github/templates/*
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Environments
+.env
+.envrc
+
+# IDE
+.idea/
+.vscode/
