@@ -16,9 +16,17 @@ class Signal:
     channel: str
     values: List[int]
 
+    def __repr__(self):
+        """String representation of the signal."""
+        return f"Signal(channel='{self.channel}', values={self.values})"
+
 
 class Receiver:
-    def __init__(self, channels: List[str], auto_enabled: Optional[bool] = True) -> None:
+    """Receiver class, used to read signals."""
+
+    def __init__(
+        self, channels: List[str], auto_enabled: Optional[bool] = True
+    ) -> None:
         self.__signal_channels: Dict[str, List[int]] = defaultdict(list)
         for channel in channels:
             self.__signal_channels[channel] = []
@@ -33,15 +41,23 @@ class Receiver:
 
     @property
     def is_enabled(self) -> bool:
+        """Return current state of the receiver."""
         return self.__is_enabled
 
     def enable(self) -> None:
+        """Enable the receiver."""
         self.__is_enabled = True
 
     def disable(self) -> None:
+        """Disable the receiver."""
         self.__is_enabled = False
 
     def get_current_channels(self) -> Tuple[str]:
+        """Get the current channels of the receiver.
+
+        Returns:
+            Tuple[str]: All available channelss
+        """
         return tuple(self.__signal_channels.keys())
 
     def __update_channel(self, channel_name: str, new_values: List[int]) -> None:
@@ -51,6 +67,15 @@ class Receiver:
     def receive_signal(
         self, signal: Signal, not_exist_ok: Optional[bool] = False
     ) -> None:
+        """Read in an incoming signal object.
+
+        Args:
+            signal (Signal): Signal to read
+            not_exist_ok (bool, default=False): If false, fail if reading to non-existent channel.
+
+        Raises:
+            SignalError: If the receiver is disabled when reading
+        """
         if not self.__is_enabled:
             raise SignalError(
                 channel=signal.channel,

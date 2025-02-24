@@ -1,5 +1,5 @@
 ---
-# Aeternum API pre-commit configuration
+# Project pre-commit configuration
 
 fail_fast: false
 
