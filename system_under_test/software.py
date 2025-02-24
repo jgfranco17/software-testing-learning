@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
-from system_under_test.errors import SignalReadError
+from system_under_test.errors import SignalError
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +24,13 @@ class Receiver:
             self.__signal_channels[channel] = []
         self.__is_enabled = auto_enabled
 
+    def __getitem__(self, key: str) -> List[int]:
+        if not isinstance(key, str):
+            raise SignalError(key, f"Invalid channel type ({type(key)}) on receiver")
+        if key not in self.__signal_channels.keys():
+            raise SignalError(key, "Channel not found in receiver")
+        return self.__signal_channels[key]
+
     @property
     def is_enabled(self) -> bool:
         return self.__is_enabled
@@ -42,16 +49,16 @@ class Receiver:
         self.__signal_channels[channel_name] = current_contents + new_values
 
     def receive_signal(
-        self, signal: Signal, not_exist_ok: Optional[bool] = True
+        self, signal: Signal, not_exist_ok: Optional[bool] = False
     ) -> None:
         if not self.__is_enabled:
-            raise SignalReadError(
+            raise SignalError(
                 channel=signal.channel,
                 message=f"Receiver for channel '{signal.channel}' is disabled",
             )
         if signal.channel not in self.get_current_channels():
             if not_exist_ok:
-                raise SignalReadError(
+                raise SignalError(
                     channel=signal.channel, message="Invalid signal channel"
                 )
             logger.info(

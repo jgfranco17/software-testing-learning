@@ -1,4 +1,4 @@
-class SignalReadError(Exception):
+class SignalError(Exception):
     def __init__(self, channel: str, message: str):
         self.__channel = channel
         self.message = message
