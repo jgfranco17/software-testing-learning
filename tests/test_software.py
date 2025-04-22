@@ -1,6 +1,7 @@
 import pytest
 
-from system_under_test.software import Receiver, Signal, SignalError
+from system_under_test.errors import ReceiverStateError, SignalError
+from system_under_test.software import Receiver, Signal
 
 
 def test_signal_initializes_correctly():
@@ -16,18 +17,29 @@ def test_receiver_initializes_default_correctly():
     assert receiver.is_enabled, "Expected reciever to be enabled by default"
 
 
-def test_receiver_enable_method():
+def test_receiver_enable_method_success():
     receiver = Receiver(["channel1"], auto_enabled=False)
-    assert not receiver.is_enabled
     receiver.enable()
     assert receiver.is_enabled, "Expected reciever to be enabled by method"
 
 
-def test_receiver_disable_method():
+def test_receiver_enable_method_fail():
+    receiver = Receiver(["channel1"], auto_enabled=True)
+    with pytest.raises(ReceiverStateError):
+        receiver.enable()
+
+
+def test_receiver_disable_method_success():
     receiver = Receiver(["channel1"], auto_enabled=True)
     assert receiver.is_enabled
     receiver.disable()
     assert not receiver.is_enabled, "Expected reciever to be disabled by method"
+
+
+def test_receiver_disable_method_fail():
+    receiver = Receiver(["channel1"], auto_enabled=False)
+    with pytest.raises(ReceiverStateError):
+        receiver.disable()
 
 
 def test_receiver_signal_read_same_channel_ok():

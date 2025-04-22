@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
-from system_under_test.errors import SignalError
+from system_under_test.errors import ReceiverStateError, SignalError
 
 logger = logging.getLogger(__name__)
 
@@ -46,10 +46,14 @@ class Receiver:
 
     def enable(self) -> None:
         """Enable the receiver."""
+        if self.__is_enabled:
+            raise ReceiverStateError("Cannot enable reciever, is already on")
         self.__is_enabled = True
 
     def disable(self) -> None:
         """Disable the receiver."""
+        if not self.__is_enabled:
+            raise ReceiverStateError("Cannot disable reciever, is already off")
         self.__is_enabled = False
 
     def get_current_channels(self) -> Tuple[str]:
