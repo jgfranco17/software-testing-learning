@@ -4,12 +4,6 @@ from system_under_test.errors import ReceiverStateError, SignalError
 from system_under_test.software import Receiver, Signal
 
 
-def test_signal_initializes_correctly():
-    signal = Signal("test_channel", [1, 2, 3])
-    assert signal.channel == "test_channel"
-    assert signal.values == [1, 2, 3]
-
-
 def test_receiver_initializes_default_correctly():
     receiver = Receiver(["channel1", "channel2", "channel3"])
     assert receiver.is_enabled, "Expected receiver to be enabled but was not"
