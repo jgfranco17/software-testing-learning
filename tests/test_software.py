@@ -1,7 +1,24 @@
+from typing import List
+
 import pytest
 
 from system_under_test.errors import ReceiverStateError, SignalError
 from system_under_test.software import Receiver, Signal
+
+
+@pytest.mark.parametrize(
+    "channels",
+    [
+        [],
+        ["channel1", "channel2", "channel3"],
+    ],
+)
+def test_receiver_init(channels: List[str]):
+    receiver = Receiver(channels)
+    loaded_channels = tuple(channels)
+    assert (
+        receiver.get_current_channels() == loaded_channels
+    ), f"Expected {len(channels)} but got {len(receiver.get_current_channels())}"
 
 
 def test_receiver_initializes_default_correctly():

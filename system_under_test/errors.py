@@ -7,6 +7,7 @@ class SignalError(Exception):
     def __str__(self):
         return f"SignalError on channel '{self.__channel}': {self.message}"
 
+
 class ReceiverStateError(Exception):
     def __init__(self, message: str):
         self.message = message
