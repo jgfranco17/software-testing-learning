@@ -2,6 +2,12 @@
 __pycache__/
 .pytest_*
 
+# Testing
+*.out
+*.html
+.coverage
+htmlcov/
+
 # templates
 .github/templates/*
 

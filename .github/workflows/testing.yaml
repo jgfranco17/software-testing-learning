@@ -1,0 +1,80 @@
+name: Testing
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up workspace
+        uses: ./.github/actions/setup-workspace
+        with:
+          python-version: "3.10"
+
+      - name: Run unit tests
+        run: |
+          poetry run coverage run -m pytest
+          poetry run coverage report > coverage.txt
+          poetry run coverage html
+
+      - name: Create GHA job summary
+        if: success() || failure()
+        run: |
+          echo "# Software Testing Learning - Unit Test Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Pytest coverage" >> $GITHUB_STEP_SUMMARY
+          echo '```console' >> $GITHUB_STEP_SUMMARY
+          cat coverage.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: htmlcov/
+
+  feature-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up workspace
+        uses: ./.github/actions/setup-workspace
+        with:
+          python-version: "3.10"
+
+      - name: Run feature tests
+        run: |
+          just behave --junit > behaviors.txt
+
+      - name: Create GHA job summary
+        if: success() || failure()
+        run: |
+          echo "# Software Testing Learning - BDD Test Report" >> $GITHUB_STEP_SUMMARY
+          echo "## Behave report" >> $GITHUB_STEP_SUMMARY
+          echo '```console' >> $GITHUB_STEP_SUMMARY
+          cat behaviors.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload JUnit reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: behave-junit-reports
+          path: reports/
