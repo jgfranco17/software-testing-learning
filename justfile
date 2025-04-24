@@ -13,6 +13,10 @@ install:
 pytest *args:
     poetry run pytest {{ args }}
 
+# Run BDD tests with Behave
+behave *args:
+    poetry run behave tests/bdd/ {{ args }}
+
 # Run the linter
 lint:
     @poetry run black .
