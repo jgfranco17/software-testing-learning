@@ -1,6 +1,7 @@
-# Python
-__pycache__/
-.pytest_*
+# Go
+*.exe
+go.work
+go.work.sum
 
 # Testing
 *.out

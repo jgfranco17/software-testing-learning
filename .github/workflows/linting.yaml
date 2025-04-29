@@ -1,29 +1,25 @@
-name: Linting
+name: Pre-commit
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
   pull_request:
 
 jobs:
-  lint:
+  pre-commit:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: "3.11"
 
-      - name: Setup workspace
-        uses: ./.github/actions/setup-workspace
-
-      - name: Install dependencies
+      - name: Install pre-commit
         run: |
           pip install pre-commit
 
